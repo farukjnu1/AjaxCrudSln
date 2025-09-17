@@ -1,0 +1,46 @@
+﻿@model AjaxCrud.ViewModels.VmStudent
+
+@{
+    ViewBag.Title = "UpdateStudent";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var strDoB = Model.DoB == null ? "" : Convert.ToDateTime(Model.DoB).ToString("yyyy-MM-dd");
+}
+
+<h2>UpdateStudent</h2>
+<form method="post" enctype="multipart/form-data">
+    <h2>Student Information System</h2>
+    <p>
+        <input type="hidden" name="studentId" id="studentId" value="@Model.StudentID" />
+        Name <input type="text" name="studentName" id="studentName" value="@Model.StudentName" />
+    </p>
+    <p>
+        Address <input type="text" name="address" id="address" value="@Model.Address" />
+    </p>
+    <p>
+        Date of Birth <input type="date" name="dob" id="dob" value="@strDoB" />
+    </p>
+    <p>
+        Picture <input type="file" name="imgFile" id="imgFile" accept="image/*" />
+    </p>
+    <p>
+        <button type="submit" id="btnUpdate">Update</button>
+    </p>
+    <p>
+        <img id="myImg" src="@Model.Picture" alt="your image" height=200 />
+    </p>
+</form>
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+<script>
+    $("#imgFile").change(function () {
+        if (this.files && this.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#myImg').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+</script>

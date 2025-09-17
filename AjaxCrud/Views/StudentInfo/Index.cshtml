@@ -1,0 +1,52 @@
+﻿@model IEnumerable<AjaxCrud.Models.Student>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "InsertStudent")
+</p>
+<table class="table" border="1" cellpadding="10">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.StudentName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Address)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DoB)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Picture)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    var strDoB = item.DoB == null ? "" : Convert.ToDateTime(item.DoB).ToString("yyyy-MM-dd");
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.StudentName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Address)
+        </td>
+        <td>
+            @strDoB
+        </td>
+        <td>
+            <img src="@item.Picture" height="200" />
+        </td>
+        <td>
+            <a href="/StudentInfo/UpdateStudent?id=@item.StudentID">Edit</a> |
+            <a href="/StudentInfo/DeleteStudent?id=@item.StudentID">Delete</a>
+        </td>
+    </tr>
+}
+
+</table>

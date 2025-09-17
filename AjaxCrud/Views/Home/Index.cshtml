@@ -1,0 +1,222 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <a href="/Home/Index">Ajax CRUD</a> | <a href="/StudentInfo/Index">MVC Razor CRUD</a>
+    <h1>Ajax</h1>
+    <div>
+        <h2>Student Information System</h2>
+        <p>
+            <input type="hidden" name="studentId" id="studentId" />
+            Name <input type="text" name="studentName" id="studentName" />
+        </p>
+        <p>
+            Address <input type="text" name="address" id="address" />
+        </p>
+        <p>
+            Date of Birth <input type="date" name="dob" id="dob" />
+        </p>
+        <p>
+            Picture <input type="file" name="imgFile" id="imgFile" accept="image/*" />
+        </p>
+        <p>
+            <button type="button" id="btnAdd">Add New</button>
+            <button type="button" id="btnUpdate">Update</button>
+            <button type="button" onclick="reset();">Reset</button>
+        </p>
+        <p>
+            <img id="myImg" src="#" alt="your image" height=200 />
+        </p>
+
+    </div>
+    <div>
+        <table id="tblStudent" border="1" cellpadding="10"></table>
+    </div>
+    <script>
+        $(document).ready(function () {
+            console.log("ready!");
+            reset();
+        });
+
+
+        $("#btnAdd").on("click", function (e) {
+            e.preventDefault();
+
+            var file = $("#imgFile").get(0).files[0];
+            var formData = new FormData();
+            if (file === undefined) {
+                formData.set("imgFile", null);
+            } else {
+                formData.set("imgFile", file, file.name);
+            }
+            formData.set("studentId", $('#studentId').val());
+            formData.set("studentName", $('#studentName').val());
+            formData.set("address", $('#address').val());
+            formData.set("dob", $('#dob').val());
+
+            $.ajax({
+                url: '@Url.Action("InsertStudent", "Home")',
+                method: "post",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false
+            })
+            .then(function (result) {
+                console.log(result);
+                reset();
+                alert(result.message);
+            });
+        });
+
+        $("#btnUpdate").on("click", function (e) {
+            e.preventDefault();
+
+            var file = $("#imgFile").get(0).files[0];
+            var formData = new FormData();
+            if (file === undefined) {
+                formData.set("imgFile", null);
+            } else {
+                formData.set("imgFile", file, file.name);
+            }
+            formData.set("studentId", $('#studentId').val());
+            formData.set("studentName", $('#studentName').val());
+            formData.set("address", $('#address').val());
+            formData.set("dob", $('#dob').val());
+
+            $.ajax({
+                url: '@Url.Action("UpdateStudent", "Home")',
+                method: "post",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false
+            })
+            .then(function (result) {
+                console.log(result);
+                reset();
+                alert(result.message);
+            });
+        });
+
+        function reset() {
+            $('#studentId').val('');
+            $('#studentName').val('');
+            $('#address').val('');
+            $('#dob').val('');
+
+            $('#btnAdd').show();
+            $('#btnUpdate').hide();
+            $('#imgFile').val(null);
+            $("#myImg").attr("src", null);
+            getStudents();
+        }
+
+        function getStudents() {
+            $('#tblStudent').empty();
+            var ajaxReq = {};
+            ajaxReq.url = "/Home/GetStudents";
+            ajaxReq.type = "GET";
+            ajaxReq.datatype = "json";
+            ajaxReq.contentType = "application/json";
+            ajaxReq.success = function (res) {
+                console.log(res);
+                $('#tblStudent').append(
+                    '<tr>'
+                    + '<th>StudentID</th>'
+                    + '<th>StudentName</th>'
+                    + '<th>Date of Birth</th>'
+                    + '<th>Address</th>'
+                    + '<th>Picture</th>'
+                    + '<th>Options</th>'
+                    + '</tr>'
+                );
+
+                for (var i = 0; i < res.length; i++) {
+                    var sl = i + 1;
+                    $("#tblStudent").append(
+                        '<tr>'
+                        + '<td>' + res[i].StudentID + '</td>'
+                        + '<td>' + res[i].StudentName + '</td>'
+                        + '<td>' + convertDateToISO(res[i].DoB) + '</td>'
+                        + '<td>' + res[i].Address + '</td>'
+                        + '<td><img src=' + res[i].Picture + ' height=200 /></td>'
+                        + '<td>'
+                        + '<button class="btn btn-default" onclick="getStudentById(' + res[i].StudentID + ')" > Edit</button > '
+                        + '<button class="btn btn-danger" onclick="removeStudentById(' + res[i].StudentID + ')" > Remove</button > '
+                        + '</td>'
+                        + '</tr>'
+                    );
+                }
+            };
+            ajaxReq.error = function () { console.log(ajaxReq.error.message); };
+            $.ajax(ajaxReq);
+        }
+
+        function getStudentById(studentId) {
+            var ajaxReq = {};
+            ajaxReq.url = "/Home/GetStudentById?id=" + studentId;
+            ajaxReq.type = "GET";
+            ajaxReq.datatype = "json";
+            ajaxReq.contentType = "application/json";
+            ajaxReq.success = function (res) {
+                $('#studentId').val(res.StudentID);
+                $('#studentName').val(res.StudentName);
+                $('#address').val(res.Address);
+                $('#dob').val(convertDateToISO(res.DoB));
+                $('#btnAdd').hide();
+                $('#btnUpdate').show();
+                //set image
+                $("#myImg").attr("src", res.Picture);
+            };
+            ajaxReq.error = function () { console.log(ajaxReq.error.message); };
+            $.ajax(ajaxReq);
+        }
+
+        function removeStudentById(studentId) {
+            if (confirm('Are you sure to delete?')) {
+                var ajaxReq = {};
+                ajaxReq.url = "/Home/DeleteStudent";
+                ajaxReq.data = JSON.stringify({ id: studentId });
+                ajaxReq.type = "POST";
+                ajaxReq.datatype = "json";
+                ajaxReq.contentType = "application/json";
+                ajaxReq.success = function (res) {
+                    console.log(res);
+                    reset();
+                    alert(result.message);
+                };
+                ajaxReq.error = function () { console.log(ajaxReq.error.message); };
+                $.ajax(ajaxReq);
+            }
+        }
+
+        function convertDateToISO(date) {
+            var nDate = date === null ? 0 : parseInt((date).toString().substr(6, 13));
+            var strDate = new Date(nDate).toISOString().substr(0, 10);
+            return strDate;
+        }
+        
+        $("#imgFile").change(function () {
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#myImg').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    </script>
+
+</body>
+</html>
