@@ -3,6 +3,7 @@
 A simple and lightweight ASP.NET Web API application demonstrating how to send and receive AJAX requests using jQuery.
 This project is perfect for understanding how front-end JavaScript interacts with an ASP.NET backend asynchronously.
 
+-----------------------
 
 🚀 Features
 
@@ -16,6 +17,7 @@ This project is perfect for understanding how front-end JavaScript interacts wit
 
 💻 Simple example for beginners learning AJAX with ASP.NET
 
+----------------------------
 
 🧩 Technologies Used
 | Component       | Description       |
@@ -26,6 +28,7 @@ This project is perfect for understanding how front-end JavaScript interacts wit
 | **IDE**         | Visual Studio     |
 | **Data Format** | JSON              |
 
+-----------------------------
 
 🧠 Future Enhancements
 
